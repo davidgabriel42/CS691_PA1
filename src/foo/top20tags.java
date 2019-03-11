@@ -1,4 +1,4 @@
-package hw1_dg;
+package foo;
 
 import java.io.IOException;
 import org.apache.log4j.Logger;

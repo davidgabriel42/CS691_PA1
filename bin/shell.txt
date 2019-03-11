@@ -1,0 +1,2 @@
+ hadoop fs -cat /data/out1/part-r-00000 | sort -n -k2 -r | head -n20 > Top-20.txt
+

@@ -1,5 +1,4 @@
-
-package foo;
+package hw1_dg;
 
 import java.io.IOException;
 import java.util.*;
@@ -12,89 +11,55 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.util.GenericOptionsParser;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-
         
-public class tophash {
+public class date_count {
         
- public static class mapHashes extends Mapper<LongWritable, Text, Text, IntWritable> {
+ public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
     private final static IntWritable one = new IntWritable(1);
     private Text word = new Text();
-        
+    String date;    
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         String line = value.toString();
-        StringTokenizer tokenizer = new StringTokenizer(line);
-        while (tokenizer.hasMoreTokens()) {
+        StringTokenizer tokenizer = new StringTokenizer(line, "\t");
         
-        	String token = tokenizer.nextToken();
-            token = token.toLowerCase();
-            if (token.startsWith("#")) {
-                word.set(token);
-                context.write(word, one);
-            }
+        while (tokenizer.hasMoreTokens()) {
         	
+        	String token = tokenizer.nextToken();
+
+	            if (token.matches("([0-9]){4}-([0-9]){2}-([0-9]){2}.*") && token.length()>= 10) {
+	                //date = token;
+	            	date = token.substring(0, 10); 
+	            			//+ "-" + token.substring(5,7) + "-" + token.substring(9,10);
+	            	word.set(date);
+	                context.write(word, one);
+	            }
+            }
         	/*word.set(tokenizer.nextToken());
             context.write(word, one);*/
         }
-    }
- } 
+    } 
         
  public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
 
-	private Map<Text, IntWritable> countMap = new HashMap<>();
-	 
     public void reduce(Text key, Iterable<IntWritable> values, Context context) 
       throws IOException, InterruptedException {
         int sum = 0;
         for (IntWritable val : values) {
             sum += val.get();
         }
-        
-        //don't write out, instead add to map
-        //context.write(key, new IntWritable(sum));
-        
-        countMap.put(new Text(key), new IntWritable(sum));
+        context.write(key, new IntWritable(sum));
     }
  }
- 
- 
- @Override
- protected void cleanup(Context context) throws IOException, InterruptedException {
-
-     Map<Text, IntWritable> sortedMap = MiscUtils.sortByValues(countMap);
-
-     int counter = 0;
-     for (Text key : sortedMap.keySet()) {
-         if (counter++ == 20) {
-             break;
-         }
-         context.write(key, sortedMap.get(key));
-     }
-}
- 
- 
         
  public static void main(String[] args) throws Exception {
     Configuration conf = new Configuration();
         
-        Job job = new Job(conf, "tophash");
+        Job job = new Job(conf, "date-count");
     
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(IntWritable.class);
         
-    job.setMapperClass(mapHashes.class);
+    job.setMapperClass(Map.class);
     job.setReducerClass(Reduce.class);
         
     job.setInputFormatClass(TextInputFormat.class);
@@ -103,7 +68,7 @@ public class tophash {
     FileInputFormat.addInputPath(job, new Path(args[0]));
     FileOutputFormat.setOutputPath(job, new Path(args[1]));
     
-    job.setJarByClass(tophash.class);
+    job.setJarByClass(hashcount.class);
     
     job.waitForCompletion(true);
  }

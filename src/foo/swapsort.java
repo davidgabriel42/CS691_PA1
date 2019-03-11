@@ -1,4 +1,4 @@
-package hw1_dg;
+package foo;
 
 import java.io.IOException;
 import java.util.*;
@@ -26,11 +26,11 @@ import org.apache.hadoop.util.ToolRunner;
 @InterfaceStability.Stable
 public class swapsort {
 
-	public static class Map extends Mapper<Text , IntWritable , IntWritable  , Text>{
+	public static class Map extends Mapper<Text , LongWritable , LongWritable  , Text>{
 	 	  
 		  /** The inverse function.  Input keys and values are swapped.*/
 		  @Override
-		  public void map(Text key, IntWritable value, Context context) 
+		  public void map(Text key, LongWritable value, Context context) 
 				  throws IOException, InterruptedException {
 		  
 			  context.write(value, key);
@@ -71,30 +71,28 @@ public class swapsort {
 	  }
 	*/
 	
-	
+	/*
 	public static class Reduce 
-	extends Reducer<Text, IntWritable, Text, IntWritable> {
+	extends Reducer<LongWritable, Text, LongWritable, Text> {
 	
-		 public void reduce(Text key, Iterable<IntWritable> values, Context context) 
+		 public void reduce(LongWritable key,Text value, Context context) 
 		   throws IOException, InterruptedException {
-		     int sum = 0;
-		     for (IntWritable val : values) {
-		         sum += val.get();
-		     }
-		     context.write(key, new IntWritable(sum));
+
+		     context.write(key, value);
 		  } 
 	}
-	     
+	     */
+	
 	public static void main(String[] args) throws Exception {
 	 Configuration conf = new Configuration();
 	     
 	     Job job = new Job(conf, "swapsort");
 	 
-	 job.setOutputKeyClass(IntWritable.class);
+	 job.setOutputKeyClass(LongWritable.class);
 	 job.setOutputValueClass(Text.class);
 	     
 	 //job.setMapperClass(Map.class);
-	 job.setReducerClass(Reduce.class);
+	 //job.setReducerClass(Reduce.class);
 	     
 	 job.setInputFormatClass(TextInputFormat.class);
 	 job.setOutputFormatClass(TextOutputFormat.class);
@@ -102,7 +100,7 @@ public class swapsort {
 	 FileInputFormat.addInputPath(job, new Path(args[0]));
 	 FileOutputFormat.setOutputPath(job, new Path(args[1]));
 	 
-	 job.setJarByClass(wordcount.class);
+	 job.setJarByClass(swapsort.class);
 	 
 	 job.waitForCompletion(true);
 	 }
