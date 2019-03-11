@@ -1,4 +1,4 @@
-package hw1_dg;
+package foo;
 
 import java.io.IOException;
 import java.util.*;

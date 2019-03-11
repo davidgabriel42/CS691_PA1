@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
         
-public class wordcount {
+public class word_count {
         
  public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
     private final static IntWritable one = new IntWritable(1);
@@ -57,7 +57,7 @@ public class wordcount {
     FileInputFormat.addInputPath(job, new Path(args[0]));
     FileOutputFormat.setOutputPath(job, new Path(args[1]));
     
-    job.setJarByClass(wordcount.class);
+    job.setJarByClass(word_count.class);
     
     job.waitForCompletion(true);
  }

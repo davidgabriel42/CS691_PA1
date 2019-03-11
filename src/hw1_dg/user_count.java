@@ -12,12 +12,12 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
         
-public class date_count {
+public class user_count {
         
  public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
     private final static IntWritable one = new IntWritable(1);
     private Text word = new Text();
-    String date;    
+    String uid;    
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         String line = value.toString();
         StringTokenizer tokenizer = new StringTokenizer(line, "\t");
@@ -26,11 +26,11 @@ public class date_count {
         	
         	String token = tokenizer.nextToken();
 
-	            if (token.matches("([0-9]){4}-([0-9]){2}-([0-9]){2}.*") && token.length()>= 10) {
+	            if (token.matches("^([0-9]){8}") ) {
 	                //date = token;
-	            	date = token.substring(0, 10); 
+	            	uid = token.substring(0, 8); 
 	            			//+ "-" + token.substring(5,7) + "-" + token.substring(9,10);
-	            	word.set(date);
+	            	word.set(token);
 	                context.write(word, one);
 	            }
             }

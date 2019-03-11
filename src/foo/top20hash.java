@@ -1,4 +1,4 @@
-package hw1_dg;
+package foo;
 
         
 import org.apache.hadoop.fs.Path;

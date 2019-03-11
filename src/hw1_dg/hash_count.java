@@ -12,32 +12,29 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
         
-public class date_count {
+public class hash_count {
         
  public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
     private final static IntWritable one = new IntWritable(1);
     private Text word = new Text();
-    String date;    
+        
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         String line = value.toString();
-        StringTokenizer tokenizer = new StringTokenizer(line, "\t");
-        
+        StringTokenizer tokenizer = new StringTokenizer(line);
         while (tokenizer.hasMoreTokens()) {
-        	
+        
         	String token = tokenizer.nextToken();
-
-	            if (token.matches("([0-9]){4}-([0-9]){2}-([0-9]){2}.*") && token.length()>= 10) {
-	                //date = token;
-	            	date = token.substring(0, 10); 
-	            			//+ "-" + token.substring(5,7) + "-" + token.substring(9,10);
-	            	word.set(date);
-	                context.write(word, one);
-	            }
+            token = token.toLowerCase();
+            if (token.startsWith("#")) {
+                word.set(token);
+                context.write(word, one);
             }
+        	
         	/*word.set(tokenizer.nextToken());
             context.write(word, one);*/
         }
-    } 
+    }
+ } 
         
  public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
 
@@ -54,7 +51,7 @@ public class date_count {
  public static void main(String[] args) throws Exception {
     Configuration conf = new Configuration();
         
-        Job job = new Job(conf, "date-count");
+        Job job = new Job(conf, "wordcount");
     
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(IntWritable.class);
